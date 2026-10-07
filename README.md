@@ -10,7 +10,8 @@ $$R_{it} - R_{ft} = \alpha_i + \beta_{i1}(R_{mt}-R_{ft}) + \beta_{i2}SMB_t + \be
 | Fichier | Description |
 |---|---|
 | `Projet1_G5.ipynb` | Notebook complet, exécuté, avec les résultats et les commentaires |
-| `Projet1_G5_brouillon.ipynb` | Ancien brouillon, conservé pour mémoire |
+| `Projet1_G5_brouillon.ipynb` | Ancien brouillon, conservé pour mémoire (à ne pas mettre dans le .zip rendu) |
+| `figures/` | Figures du rapport, générées par le notebook |
 | `data/FMAGX_quotidien.csv` | VL quotidiennes brutes et ajustées (Yahoo Finance) |
 | `data/FF_Research_Data_Factors_mensuel.csv` | Mkt-RF, SMB, HML, RF (Kenneth French Data Library) |
 | `data/FF_Momentum_Factor_mensuel.csv` | Facteur momentum (Kenneth French Data Library) |
@@ -31,9 +32,10 @@ $$R_{it} - R_{ft} = \alpha_i + \beta_{i1}(R_{mt}-R_{ft}) + \beta_{i2}SMB_t + \be
 4. Prétraitement : valeurs manquantes, valeurs aberrantes (IQR), cours ajusté vs cours brut
 5. Analyse exploratoire : statistiques descriptives, Jarque–Bera, histogrammes, corrélations
 6. Estimation MCO du modèle FF3 (comparé au CAPM)
-7. Diagnostic : VIF, Breusch–Pagan/White + HC1, normalité, autocorrélation, distance de Cook
+7. Diagnostic : VIF, Breusch–Pagan/White + HC1, normalité, autocorrélation (Durbin–Watson, Ljung–Box, Breusch–Godfrey),
+   distance de Cook, RESET de Ramsey, test de Chow (rupture en septembre 2024, fixée a priori)
 8. Validation hors échantillon (48/12 mois) et régressions glissantes sur 36 mois
-9. Extension Carhart (4 facteurs) : R² ajusté, AIC, BIC, test F
+9. Extension Carhart (4 facteurs) : R² ajusté, AIC, BIC, test F ; sélection stepwise ascendante par BIC
 10. Robustesse : taux sans risque FRED, rendements simples
 11. Bilan critique
 12. Export des résidus pour le Projet 2
@@ -50,6 +52,7 @@ $$R_{it} - R_{ft} = \alpha_i + \beta_{i1}(R_{mt}-R_{ft}) + \beta_{i2}SMB_t + \be
 
 - Breusch–Pagan : pas d'hétéroscédasticité détectée (p = 0,55).
 - VIF : tous inférieurs à 1,2.
+- Breusch–Godfrey (p = 1, 6, 12), RESET et Chow : aucun rejet, le modèle est bien spécifié et stable.
 - Momentum (Carhart) : significatif (p = 0,02), mais ne réduit le BIC que de 1,9, ce qui est une preuve faible. Le FF3 reste le modèle de référence.
 
 ## Exécution
@@ -66,6 +69,9 @@ Pour relancer le notebook :
 jupyter nbconvert --to notebook --execute --inplace Projet1_G5.ipynb
 ```
 
-Tous les paramètres (fonds, période, seuil) se trouvent dans la 2ᵉ cellule de code. Si vous relancez le notebook plus
-tard, Yahoo ou K. French peuvent avoir révisé légèrement leurs données : les chiffres cités dans les textes
-d'interprétation peuvent alors différer un peu des résultats affichés.
+Tous les paramètres (fonds, période, seuil) se trouvent dans la 2ᵉ cellule de code.
+
+**Reproductibilité.** Par défaut (`USE_LOCAL_DATA = True`), le notebook relit les données brutes de `data/`, téléchargées
+le 25/09/2026 : il redonne exactement les résultats du rapport, sans connexion internet. Avec `USE_LOCAL_DATA = False`,
+il retélécharge tout depuis Yahoo, K. French et la FRED, puis écrase les CSV. Les sources pouvant avoir révisé leurs
+séries, les chiffres peuvent alors différer légèrement de ceux cités dans les textes.
